@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Socket.IO chat</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font: 13px Helvetica, Arial;
+    }
+
+    form {
+      background: #000;
+      padding: 3px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+
+    form input {
+      border: 0;
+      padding: 10px;
+      width: 90%;
+      margin-right: .5%;
+    }
+
+    form button {
+      width: 9%;
+      background: rgb(130, 224, 255);
+      border: none;
+      padding: 10px;
+    }
+
+    #messages {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    #messages li {
+      padding: 5px 10px;
+    }
+
+    #messages li:nth-child(odd) {
+      background: #eee;
+    }
+  </style>
+</head>
+<script src="/socket.io/socket.io.js"></script>
+
+<body>
+  <input id="name" placeholder="Enter nickname here" type="text" />
+  <ul id="connectedUsers"></ul>
+  <ul id="messages"></ul>
+  <div id="whoIsTyping"></div>
+  <form id="form1">
+    <input id="m" type="text" autocomplete="off" />
+    <input type="submit" />
+  </form>
+
+  <!-- - Broadcast a message to connected users when someone connects or disconnects
+- Show who's online
+- Add private messaging
+- Share your improvements! -->
+
+
+  <script>
+    let socket = io();
+    let name = ''
+    document.getElementById('name').addEventListener('change', (evt)=>{
+      name = evt.target.value;
+    })
+    document.getElementById('m').addEventListener('keyup', ()=>{
+      socket.emit('whoIsTyping', name)
+    })
+    document.getElementById('form1').addEventListener('submit', function(evt) {
+      evt.preventDefault();
+      let newMessage = document.getElementById('m').value;
+      socket.emit('chat message', newMessage)
+      document.getElementById('messages').appendChild(document.createElement('li')).appendChild(document.createTextNode(newMessage))
+    })
+    socket.on('chat message', (msg) => {
+      document.getElementById('messages').appendChild(document.createElement('li')).appendChild(document.createTextNode(msg))
+    })
+    socket.on('whoIsTyping', (id) => {
+      document.getElementById('whoIsTyping').innerText = `${id || 'other user'} is typing`
+      setTimeout(() => document.getElementById('whoIsTyping').innerText = '',1000)
+    })
+    socket.on('connectedUsers', (users) => {
+      users.map(i => document.getElementById('connectedUsers').appendChild(document.createElement('li')).appendChild(document.createTextNode(i)))
+    })
+  </script>
+</body>
+
+</html>
