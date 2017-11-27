@@ -10,15 +10,15 @@ res.sendFile(__dirname + '/index.html');
 });
 
 io.on('connection', function(socket){
-  console.log('a user connected');
+  socket.broadcast.emit('justConnected', socket.id);
   if (!connectedUsers.includes(socket.id)){
     connectedUsers.push(socket.id)
   }
-  socket.emit('connectedUsers', connectedUsers)
+  io.emit('connectedUsers', connectedUsers)
   socket.on('disconnect', function(){
     console.log('user disconnected');
-    console.log(socket.id);
-    connectedUsers.filter(i => socket.id == i)
+    connectedUsers = connectedUsers.filter(i => socket.id !== i)
+    socket.emit('connectedUsers', connectedUsers)
   });
   socket.on('chat message', function(msg){
     socket.broadcast.emit('chat message', msg);

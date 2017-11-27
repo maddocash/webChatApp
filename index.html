@@ -55,7 +55,11 @@
 
 <body>
   <input id="name" placeholder="Enter nickname here" type="text" />
+  <p>
+    Online Users
+  </p>
   <ul id="connectedUsers"></ul>
+  <div id="justConnected"></div>
   <ul id="messages"></ul>
   <div id="whoIsTyping"></div>
   <form id="form1">
@@ -64,7 +68,6 @@
   </form>
 
   <!-- - Broadcast a message to connected users when someone connects or disconnects
-- Show who's online
 - Add private messaging
 - Share your improvements! -->
 
@@ -90,6 +93,10 @@
     socket.on('whoIsTyping', (id) => {
       document.getElementById('whoIsTyping').innerText = `${id || 'other user'} is typing`
       setTimeout(() => document.getElementById('whoIsTyping').innerText = '',1000)
+    })
+    socket.on('justConnected', (id) => {
+      document.getElementById('justConnected').innerText = `${id} has been connected`
+      setTimeout(() => document.getElementById('justConnected').innerText = '',2000)
     })
     socket.on('connectedUsers', (users) => {
       users.map(i => document.getElementById('connectedUsers').appendChild(document.createElement('li')).appendChild(document.createTextNode(i)))
